@@ -1,5 +1,6 @@
 const express = require('express')
 const bodyParser = require('body-parser')
+const date = require(__dirname + '/date.js')
 
 
 const app = express()
@@ -9,19 +10,46 @@ app.use(bodyParser.urlencoded({extended:true}))
 app.use(express.static('public'))
 
 
-let newItems = ['cook','eat']
+const newItems = ['cook','eat']
+const workItems =[]
+
+
+
+
+//-----------------------------------------
+
 
 
 app.get('/', (req, res) => {
-  let today = new Date()
+  const day =  date.getDate()
+  res.render('list', {title: day, newTodos: newItems})
 
-  let options = {
-    weekday: 'long',
-    year: 'numeric',
-    month: 'long',
-    day: 'numeric'
+})
+
+
+app.post('/', (req, res) => {
+  if(req.body.button === 'Work Todo'){
+    workItem = req.body.todo
+    workItems.push(workItem)
+    res.redirect('/work')
+  } else {
+    newItem = req.body.todo
+    newItems.push(newItem)
+    res.redirect('/')
   }
-  let day = today.toLocaleDateString('en-US', options)
+})
+
+
+app.get('/work', (req, res) =>{
+  res.render('work', {title: 'Work Todo', newTodos: workItems})
+})
+
+
+app.listen(3000, () => {
+  console.log('server is running on port 3000.')
+})
+
+
 
   //----------------------------------------
   // switch (currentDay) {
@@ -56,17 +84,3 @@ app.get('/', (req, res) => {
   //   day = 'Weekday'
   // }
   //----------------------------------------
-  res.render('list', {kindOfDay: day, newTodos: newItems})
-
-})
-
-
-app.post('/', (req, res) => {
-  newItem = req.body.todo
-  newItems.push(newItem)
-  res.redirect('/')
-})
-
-app.listen(3000, () => {
-  console.log('server is running on port 3000.')
-})
